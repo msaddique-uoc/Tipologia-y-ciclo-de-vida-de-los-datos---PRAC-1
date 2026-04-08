@@ -1,74 +1,47 @@
 import requests
-from bs4 import BeautifulSoup
 import csv
-import time
 import os
 
-BASE_URL = "https://www.themoviedb.org/movie?page="
+API_KEY = "thewdb"  # API gratuita
+BASE_URL = "http://www.omdbapi.com/"
 
-HEADERS = {
-    "User-Agent": "Mozilla/5.0",
-    "Accept-Language": "en-US,en;q=0.9"
-}
-
-def get_movies(page):
-    url = BASE_URL + str(page)
-    response = requests.get(url, headers=HEADERS)
-    soup = BeautifulSoup(response.text, "html.parser")
-
+def get_movies():
     movies = []
 
-    cards = soup.select("div.card")
+    search_terms = ["batman", "avengers", "spiderman"]
 
-    for card in cards:
-        try:
-            title = card.select_one("h2")
-            title = title.text.strip() if title else "N/A"
+    for term in search_terms:
+        params = {
+            "apikey": API_KEY,
+            "s": term
+        }
 
-            rating = card.select_one("div.user_score_chart")
-            rating = rating["data-percent"] if rating and rating.has_attr("data-percent") else "N/A"
+        response = requests.get(BASE_URL, params=params)
+        data = response.json()
 
-            date = card.select_one("p")
-            date = date.text.strip() if date else "N/A"
+        if "Search" in data:
+            for item in data["Search"]:
+                movies.append({
+                    "title": item.get("Title", "N/A"),
+                    "year": item.get("Year", "N/A"),
+                    "imdb_id": item.get("imdbID", "N/A"),
+                    "type": item.get("Type", "N/A")
+                })
 
-            link = card.select_one("a")
-            link = "https://www.themoviedb.org" + link["href"] if link else "N/A"
-
-            movies.append({
-                "title": title,
-                "rating": rating,
-                "release_date": date,
-                "movie_url": link
-            })
-
-        except:
-            continue
-
-    print(f"Películas encontradas en página {page}: {len(movies)}")
     return movies
 
 
 def main():
-    dataset = []
+    dataset = get_movies()
 
-    for page in range(1, 6):
-        print(f"Scrapeando página {page}...")
-        movies = get_movies(page)
-        dataset.extend(movies)
-        time.sleep(2)
+    os.makedirs("dataset", exist_ok=True)
 
-    if len(dataset) == 0:
-        print("ERROR: No se extrajo ningún dato")
-        return
-
-    output_path = os.path.join("dataset", "movies_dataset.csv")
-
-    with open(output_path, "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=dataset[0].keys())
+    with open("dataset/movies_dataset.csv", "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=["title", "year", "imdb_id", "type"])
         writer.writeheader()
         writer.writerows(dataset)
 
-    print(f"Dataset generado correctamente con {len(dataset)} registros")
+    print(f"Dataset generado con {len(dataset)} películas")
 
 
 if __name__ == "__main__":

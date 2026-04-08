@@ -1,16 +1,31 @@
-title,rating,release_date,movie_url
-Sort,N/A,N/A,N/A
-Where To Watch 52,N/A,N/A,https://www.themoviedb.org#
-Filters,N/A,N/A,https://www.themoviedb.org/discover/movie?with_genres=28
-Sort,N/A,N/A,N/A
-Where To Watch 52,N/A,N/A,https://www.themoviedb.org#
-Filters,N/A,N/A,https://www.themoviedb.org/discover/movie?with_genres=28
-Sort,N/A,N/A,N/A
-Where To Watch 52,N/A,N/A,https://www.themoviedb.org#
-Filters,N/A,N/A,https://www.themoviedb.org/discover/movie?with_genres=28
-Sort,N/A,N/A,N/A
-Where To Watch 52,N/A,N/A,https://www.themoviedb.org#
-Filters,N/A,N/A,https://www.themoviedb.org/discover/movie?with_genres=28
-Sort,N/A,N/A,N/A
-Where To Watch 52,N/A,N/A,https://www.themoviedb.org#
-Filters,N/A,N/A,https://www.themoviedb.org/discover/movie?with_genres=28
+title,year,imdb_id,type
+Batman Begins,2005,tt0372784,movie
+The Batman,2022,tt1877830,movie
+Batman v Superman: Dawn of Justice,2016,tt2975590,movie
+Batman v Superman: Dawn of Justice,2016,tt2975590,movie
+Batman,1989,tt0096895,movie
+Batman Returns,1992,tt0103776,movie
+Batman & Robin,1997,tt0118688,movie
+Batman Forever,1995,tt0112462,movie
+The Lego Batman Movie,2017,tt4116284,movie
+Batman: The Animated Series,1992–1995,tt0103359,series
+The Avengers,2012,tt0848228,movie
+Avengers: Endgame,2019,tt4154796,movie
+Avengers: Infinity War,2018,tt4154756,movie
+Avengers: Age of Ultron,2015,tt2395427,movie
+The Avengers,1998,tt0118661,movie
+The Avengers: Earth's Mightiest Heroes,2010–2024,tt1626038,series
+Ultimate Avengers: The Movie,2006,tt0491703,movie
+The Avengers,1961–1969,tt0054518,series
+Avengers Assemble,2012–2019,tt2455546,series
+Ultimate Avengers II,2006,tt0803093,movie
+Italian Spiderman,2007,tt2705436,movie
+"Superman, Spiderman or Batman",2011,tt2084949,movie
+Spiderman,1990,tt0100669,movie
+The Amazing Spiderman 2 Webb Cut,2021,tt18351128,movie
+Spiderman the Verse,2019–,tt12122034,series
+Spiderman,2010,tt1785572,movie
+Spiderman in Cannes,2016,tt5978586,movie
+Spiderman and Grandma,2009,tt1433184,movie
+"Fighting, Flying and Driving: The Stunts of Spiderman 3",2007,tt1132238,movie
+Discount Spiderman 2,2018,tt9146610,movie
