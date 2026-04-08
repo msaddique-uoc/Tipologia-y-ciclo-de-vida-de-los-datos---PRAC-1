@@ -3,7 +3,7 @@ import requests
 import csv
 from bs4 import BeautifulSoup
 
-# URL de películas (tabla real)
+# URL
 URL = "https://www.boxofficemojo.com/chart/ww_top_lifetime_gross/"
 
 HEADERS = {
@@ -28,8 +28,8 @@ def query_movies(url, headers, dataset):
     for i, row in enumerate(rows):
         cells = row.find_all("td")
 
-        # Saltar cabecera
-        if i == 0 or len(cells) < 6:
+        # Saltar cabecera o filas incompletas
+        if i == 0 or len(cells) < 5:
             continue
 
         try:
@@ -43,15 +43,14 @@ def query_movies(url, headers, dataset):
             if title_tag and title_tag.get("href"):
                 movie_url = "https://www.boxofficemojo.com" + title_tag["href"]
 
+            # columnas correctas
             worldwide = cells[2].get_text(strip=True)
             domestic = cells[3].get_text(strip=True)
             foreign = cells[4].get_text(strip=True)
-            year = cells[5].get_text(strip=True)
 
             element = [
                 rank,
                 title,
-                year,
                 worldwide,
                 domestic,
                 foreign,
@@ -67,17 +66,15 @@ def query_movies(url, headers, dataset):
 def main():
     print("Generando dataset de películas...")
 
-    # Ruta del archivo
     current_dir = os.path.dirname(__file__)
     file_path = os.path.join(current_dir, "..", "dataset", "movies_dataset.csv")
 
     dataset = []
 
-    # Cabecera
+    # HEADER FINAL (coherente)
     header = [
         "rank",
         "title",
-        "year",
         "worldwide_box_office",
         "domestic_box_office",
         "foreign_box_office",
@@ -86,7 +83,6 @@ def main():
 
     dataset.append(header)
 
-    # Scraping
     query_movies(URL, HEADERS, dataset)
 
     # Crear carpeta si no existe
@@ -95,9 +91,7 @@ def main():
     # Guardar CSV
     with open(file_path, "w", newline="", encoding="utf-8") as file:
         writer = csv.writer(file)
-
-        for row in dataset:
-            writer.writerow(row)
+        writer.writerows(dataset)
 
     print(f"Dataset generado correctamente en: {file_path}")
     print(f"Número de películas: {len(dataset)-1}")
