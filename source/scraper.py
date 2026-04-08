@@ -1,114 +1,63 @@
+import os
 import requests
 import csv
-import os
-import time
+from bs4 import BeautifulSoup
 
-API_KEY = "thewdb"   # tu clave actual
-BASE_URL = "https://www.omdbapi.com/"
+# URL con tabla de películas
+URL = "https://www.boxofficemojo.com/chart/ww_top_lifetime_gross/"
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0"
 }
 
+def queryMovies(url, headers, dataset):
+    response = requests.get(url, headers=headers)
+    soup = BeautifulSoup(response.text, "html.parser")
 
-def search_movies(search_term: str):
-    """
-    Busca películas por término usando el parámetro s.
-    """
-    params = {
-        "apikey": API_KEY,
-        "s": search_term,
-        "type": "movie"
-    }
+    table = soup.find("table")
 
-    response = requests.get(BASE_URL, params=params, headers=HEADERS, timeout=20)
-    response.raise_for_status()
-    data = response.json()
+    currentIndex = 0
 
-    if data.get("Response") == "True":
-        return data.get("Search", [])
-    return []
+    for row in table.find_all("tr"):
+        cells = row.find_all("td")
 
+        if currentIndex > 0:  # saltar cabecera
 
-def get_movie_details(imdb_id: str):
-    """
-    Obtiene detalle de una película usando el parámetro i.
-    Aquí sí vienen campos como imdbRating y BoxOffice.
-    """
-    params = {
-        "apikey": API_KEY,
-        "i": imdb_id
-    }
+            if len(cells) >= 4:
+                rank = cells[0].text.strip()
+                title = cells[1].text.strip()
+                year = cells[2].text.strip()
+                box_office = cells[3].text.strip()
 
-    response = requests.get(BASE_URL, params=params, headers=HEADERS, timeout=20)
-    response.raise_for_status()
-    data = response.json()
+                element = [rank, title, year, box_office]
 
-    if data.get("Response") == "True":
-        return data
-    return {}
+                dataset.append(element)
+
+        currentIndex += 1
 
 
-def get_movies():
-    dataset = []
-    seen_ids = set()
+# Directorio actual
+currentDir = os.path.dirname(__file__)
+filename = "movies_dataset.csv"
+filePath = os.path.join(currentDir, "..", "dataset", filename)
 
-    search_terms = ["batman", "avengers", "spiderman", "superman"]
+# Crear dataset
+dataset = []
+header = ["Rank", "Title", "Year", "Box Office"]
+dataset.append(header)
 
-    for term in search_terms:
-        print(f"Buscando: {term}")
-        results = search_movies(term)
+print("Generando dataset de películas...")
 
-        for item in results:
-            imdb_id = item.get("imdbID", "N/A")
+queryMovies(URL, HEADERS, dataset)
 
-            if imdb_id in seen_ids:
-                continue
+# Crear carpeta
+os.makedirs(os.path.dirname(filePath), exist_ok=True)
 
-            details = get_movie_details(imdb_id)
-            seen_ids.add(imdb_id)
+# Guardar CSV
+with open(filePath, 'w', newline='', encoding="utf-8") as csvFile:
+    writer = csv.writer(csvFile)
 
-            dataset.append({
-                "title": details.get("Title", item.get("Title", "N/A")),
-                "year": details.get("Year", item.get("Year", "N/A")),
-                "imdb_rating": details.get("imdbRating", "N/A"),
-                "box_office": details.get("BoxOffice", "N/A"),
-                "type": details.get("Type", item.get("Type", "N/A")),
-                "imdb_id": imdb_id,
-                "imdb_url": f"https://www.imdb.com/title/{imdb_id}/"
-            })
+    for row in dataset:
+        writer.writerow(row)
 
-            time.sleep(0.5)
-
-    return dataset
-
-
-def main():
-    dataset = get_movies()
-
-    os.makedirs("dataset", exist_ok=True)
-
-    output_file = os.path.join("dataset", "movies_dataset.csv")
-
-    with open(output_file, "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(
-            f,
-            fieldnames=[
-                "title",
-                "year",
-                "imdb_rating",
-                "box_office",
-                "type",
-                "imdb_id",
-                "imdb_url"
-            ]
-        )
-        writer.writeheader()
-        writer.writerows(dataset)
-
-    print(f"Dataset generado con {len(dataset)} películas")
-    print(f"Archivo guardado en: {output_file}")
-
-
-if __name__ == "__main__":
-    main()
+print(f"Dataset generado correctamente en: {filePath}")
